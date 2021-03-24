@@ -13,19 +13,32 @@ import openpyxl
 import datetime
 import csv
 import pickle
-import pandas
+import pandas as pd
 
 import pprint
 
 # for laptop. Need to make this more general
-# loc = "C:/Users/Scrooge/Documents/Coding/Life Data Processing/2020 sheets"
-loc = "E:/Documents/Coding/Life Data Processing/2020 sheets"
+#loc = "C:/Users/Scrooge/Documents/Coding/Life Data Processing/2020 sheets"
+loc = "E:/Documents/Datasets/Life_Data/2020 sheets"
 
 filename = "Daily log 2020.xlsx"
 
 filepath = loc + "/" + filename
 
 date_type = datetime.datetime.now()
+
+month_list = ['January',
+          'February',
+          'March',
+          'May',
+          'April',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December']
 
 # ==============================================================================
 # Excel sheet opener
@@ -184,7 +197,7 @@ def word_processor(string):
 # 24 hour clock caluclator
 
 
-def  mil_time_gen(seg):
+def mil_time_gen(seg):
     
     hour = int(seg/2) + 1
     minute = (int(seg)*30) % 60
@@ -244,71 +257,81 @@ def mst_writer(calendar, name):
 # open our files and extract the raw data
 
 
-raw = open_xlsx(filepath)
+#raw = open_xlsx(filepath)
+
+raw = pd.read_excel(filepath, sheet_name=None, usecols='A:AX', index_col="Date", na_filter=False)
 
 # ==============================================================================
 # generate a list of activity catagories
 
 legend = []
-totals = {}
 
-for cell in (raw['January'][0]):
-    
-    temp = word_processor(cell)
-    
-    if temp in [None, ""]:
-        continue
-    
-    legend.append(temp)
-    totals[temp] = 0
-    
+for item in list(raw['January'].iloc[:, 0]) :
+
+    item = word_processor(item)
+    if item:
+        legend.append(item)
+
+#
+# totals = {}
+#
+# for cell in (raw['January'][0]):
+#
+#     temp = word_processor(cell)
+#
+#     if temp in [None, ""]:
+#         continue
+#
+#     legend.append(temp)
+#     totals[temp] = 0
+
 # ==============================================================================
 # generate daily totals and linear
 
-master = {}
-linear = {}
-totals["total"] = 0
-prev_activ = None
-
-for month in raw.keys():
-    
-    end_flag = False
-    
-    for x in range(1,len(raw[month][1])):
-        
-        temp = {}
-        empty_cells = 0
-        
-        if not (type(raw[month][1][x]) == type(date_type)):
-            continue
-        
-        for y in range(2,len(raw[month])):
-            
-            activ_type = word_processor(raw[month][y][x])
-            
-            if (activ_type == None) or (activ_type == "") or (activ_type == " "):
-                activ_type = prev_activ
-                empty_cells += 1
-                
-                if empty_cells > 24:
-                    end_flag = True
-                    break
-                
-            datetime = date_string_gen(raw[month][1][x]) + mil_time_gen(y-2)
-            
-            linear[datetime] = activ_type
-            
-            temp[mil_time_gen(y-2)] = activ_type
-            
-            totals[activ_type] = totals[activ_type] + 0.5
-            totals["total"] = totals["total"] + 0.5
-            
-            prev_activ = activ_type
-         
-        if end_flag:
-            continue
-        
-        master[raw[month][1][x].date()] = temp
+# master = {}
+# linear = {}
+# totals["total"] = 0
+# prev_activ = None
+#
+# for month in raw.keys():
+#
+#     end_flag = False
+#
+#     for x in range(1,len(raw[month][1])):
+#
+#         temp = {}
+#         empty_cells = 0
+#
+#         if not (type(raw[month][1][x]) == type(date_type)):
+#             continue
+#
+#         for y in range(2,len(raw[month])):
+#
+#             activ_type = word_processor(raw[month][y][x])
+#
+#             if (activ_type == None) or (activ_type == "") or (activ_type == " "):
+#                 activ_type = prev_activ
+#                 empty_cells += 1
+#
+#                 if empty_cells > 24:
+#                     end_flag = True
+#                     break
+#
+#             datetime = date_string_gen(raw[month][1][x]) + mil_time_gen(y-2)
+#
+#             linear[datetime] = activ_type
+#
+#             temp[mil_time_gen(y-2)] = activ_type
+#
+#             totals[activ_type] = totals[activ_type] + 0.5
+#             totals["total"] = totals["total"] + 0.5
+#
+#             prev_activ = activ_type
+#
+#         if end_flag:
+#             continue
+#
+#         master[raw[month][1][x].date()] = temp
         #print()
             
 #lin_writer(linear, "hourly_calendar")
