@@ -2,7 +2,7 @@
 """
 Created on Sat Oct 10 13:44:50 2020
 
-@author: Scrooge
+@author: Scott
 
 
 TO-DO:
@@ -13,11 +13,12 @@ import openpyxl
 import datetime
 import csv
 import pickle
+import pandas
 
 import pprint
 
-#for laptop. Need to make this more general
-#loc = "C:/Users/Scrooge/Documents/Coding/Life Data Processing/2020 sheets"
+# for laptop. Need to make this more general
+# loc = "C:/Users/Scrooge/Documents/Coding/Life Data Processing/2020 sheets"
 loc = "E:/Documents/Coding/Life Data Processing/2020 sheets"
 
 filename = "Daily log 2020.xlsx"
@@ -26,12 +27,13 @@ filepath = loc + "/" + filename
 
 date_type = datetime.datetime.now()
 
-#==============================================================================
-#Excel sheet opener
-#==============================================================================
+# ==============================================================================
+# Excel sheet opener
+# ==============================================================================
 
-#returns a dictionary, where the worksheets are the keys
-#each sheet is a 2D nested list
+# returns a dictionary, where the worksheets are the keys
+# each sheet is a 2D nested list
+
 
 def open_xlsx(file):
     
@@ -61,8 +63,9 @@ def open_xlsx(file):
         
     return raw_sheets
     
-#==============================================================================
-#generate a Julian date from a datetime.datetime object
+# ==============================================================================
+# generate a Julian date from a datetime.datetime object
+
 
 def gen_JD(dt_obj):
 
@@ -112,9 +115,10 @@ def gen_JD(dt_obj):
     else:
         return str(yr) + str(day)
     
-#==============================================================================
-#generate a datestring from a datetime.datetime object
-    
+# ==============================================================================
+# generate a datestring from a datetime.datetime object
+
+
 def date_string_gen(dt_obj):
 
     out_str = str(dt_obj.year)
@@ -131,7 +135,7 @@ def date_string_gen(dt_obj):
     return out_str + month + day
     
     
-#==============================================================================
+# ==============================================================================
 
 def process_raw(raw): 
     
@@ -152,9 +156,10 @@ def process_raw(raw):
     
     linear = {}
     
-#==============================================================================
-#cleans up strings, removing leading and following spaces, carriage returns and
-#changing to lower case
+# ==============================================================================
+# cleans up strings, removing leading and following spaces, carriage returns and
+# changing to lower case
+
 
 def word_processor(string):
     
@@ -175,9 +180,10 @@ def word_processor(string):
     else:
         return mid.lower()
     
-#==============================================================================
-#24 hour clock caluclator
-        
+# ==============================================================================
+# 24 hour clock caluclator
+
+
 def  mil_time_gen(seg):
     
     hour = int(seg/2) + 1
@@ -190,14 +196,14 @@ def  mil_time_gen(seg):
     
     return mil_time
 
-#==============================================================================
-#linear calendar writer
-    
+# ==============================================================================
+# linear calendar writer
+
+
 def lin_writer(calendar, name):
     
     if ".csv" not in name:
         name = name + ".csv"
-    
 
     with open(name, 'w', newline="") as csvfile:
         
@@ -210,14 +216,13 @@ def lin_writer(calendar, name):
             writer.writerow(out)
 
 
-#==============================================================================
-#master calendar writer
+# ==============================================================================
+# master calendar writer
     
 def mst_writer(calendar, name):
     
     if ".csv" not in name:
         name = name + ".csv"
-    
 
     with open(name, 'w', newline="") as csvfile:
         
@@ -232,20 +237,17 @@ def mst_writer(calendar, name):
             
             writer.writerow(out)
 
-#==============================================================================
+# ==============================================================================
 #                        End of functions
 #                         Start of MAIN
-#==============================================================================
-    
+# ==============================================================================
+# open our files and extract the raw data
 
-
-#==============================================================================
-#open our files and extract the raw data
 
 raw = open_xlsx(filepath)
 
-#==============================================================================
-#generate a list of activity catagories
+# ==============================================================================
+# generate a list of activity catagories
 
 legend = []
 totals = {}
@@ -260,8 +262,8 @@ for cell in (raw['January'][0]):
     legend.append(temp)
     totals[temp] = 0
     
-#==============================================================================    
-#generate daily totals and linear 
+# ==============================================================================
+# generate daily totals and linear
 
 master = {}
 linear = {}
@@ -309,11 +311,11 @@ for month in raw.keys():
         master[raw[month][1][x].date()] = temp
         #print()
             
-lin_writer(linear, "hourly_calendar")
-mst_writer(master, "formatted_calendar")       
+#lin_writer(linear, "hourly_calendar")
+#mst_writer(master, "formatted_calendar")
 
-pickle.dump(master, open("master_calendar.dat", "wb"))
-pickle.dump(linear, open("vector_calendar.dat", "wb"))
+#pickle.dump(master, open("master_calendar.dat", "wb"))
+#pickle.dump(linear, open("vector_calendar.dat", "wb"))
     
 #pprint.pprint(master) 
 

@@ -19,11 +19,11 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
-#==============================================================================
-#datify
-#takes a datetime or date indexed dataframe and returns and calculates the t-delta
-#IN: dataframe, date indexed
-#OUT: dataframe, date indexed containing t-delta
+# ==============================================================================
+# datify
+# takes a datetime or date indexed dataframe and returns and calculates the t-delta
+# IN: dataframe, date indexed
+# OUT: dataframe, date indexed containing t-delta
 
 def datify(df):
     
@@ -38,14 +38,15 @@ def datify(df):
         
     return ts
 
-#==============================================================================
-#2d_dat_checker
-#cleans data for plotting
+# ==============================================================================
+# 2d_dat_checker
+# cleans data for plotting
 #   removes NaNs/NaTs
 #   ensures lists are the same length    
-#IN: dataframe, two strings with the names of desired datasets, maximum tim difference between points
-#OUT: dataframe with columns representing the datasets and the time delta
-    
+# IN: dataframe, two strings with the names of desired datasets, maximum tim difference between points
+# OUT: dataframe with columns representing the datasets and the time delta
+
+
 def d2_dat_checker(dat, col1, col2):
     
     N = len(dat)
@@ -62,15 +63,16 @@ def d2_dat_checker(dat, col1, col2):
         
         set1.append(datpt1), set2.append(datpt2), delt.append(deltpt), date.append(dates[n])
         
-    #return pd.DataFrame([delt,set1,set2],index=date,columns=['delt',col1,col2])
+    # return pd.DataFrame([delt,set1,set2],index=date,columns=['delt',col1,col2])
     return pd.DataFrame({'delt': delt, col1: set1, col2: set2},index=date)
 
-#==============================================================================
-#delta_gen
-#calculates change in a single dataset  
-#IN: dataframe, column to be delta'd
-#OUT: dataframe original column and index and delta column
-        
+# ==============================================================================
+# delta_gen
+# calculates change in a single dataset
+# IN: dataframe, column to be delta'd
+# OUT: dataframe original column and index and delta column
+
+
 def delta_gen(df, col):
     
     N = len(df)
@@ -85,15 +87,16 @@ def delta_gen(df, col):
         
     return pd.DataFrame()
         
-#==============================================================================
-#interpolate
-#interpolates a single data column
-#IN: dataframe, column to be delta'd, type of interpolation, maximum span
-#OUT: dataframe of dates and interpolated data
+# ==============================================================================
+# interpolate
+# interpolates a single data column
+# IN: dataframe, column to be delta'd, type of interpolation, maximum span
+# OUT: dataframe of dates and interpolated data
 
-#==============================================================================
-#main
-#==============================================================================
+# ==============================================================================
+# main
+# ==============================================================================
+
 
 data = pickle.load(open("raw_master_db.dat",'rb'))
 data.sort_index(axis=0,inplace=True)
