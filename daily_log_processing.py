@@ -12,6 +12,7 @@ TO-DO:
 import openpyxl
 import datetime
 import csv
+import datetime
 import pickle
 import pandas as pd
 
@@ -20,6 +21,7 @@ import pprint
 # for laptop. Need to make this more general
 #loc = "C:/Users/Scrooge/Documents/Coding/Life Data Processing/2020 sheets"
 loc = "E:/Documents/Datasets/Life_Data/2020 sheets"
+out_loc = "E:/Documents/Datasets/Life_Data/Spreadsheets"
 
 filename = "Daily log 2020.xlsx"
 
@@ -257,25 +259,17 @@ def mst_writer(calendar, name):
 # open our files and extract the raw data
 
 
-#raw = open_xlsx(filepath)
-
 raw = pd.read_excel(filepath, sheet_name=None, usecols='A:AX', index_col="Date", na_filter=False)
 
 # ==============================================================================
 # generate a list of activity catagories
 
-legend = {}
+legend = []
 
 for item in list(raw['January'].iloc[:, 0]):
 
-    item = word_processor(item)
-    if item:
-        legend[item] = 0
+    legend.append(word_processor(item))
 
-
-
-#
-# totals = {}
 #
 # for cell in (raw['January'][0]):
 #
@@ -290,12 +284,58 @@ for item in list(raw['January'].iloc[:, 0]):
 # ==============================================================================
 # generate daily totals and linear
 
-# master = {}
+totals = {}
+last_cell = "sleep"
+master = {}
+
 # linear = {}
 # totals["total"] = 0
 # prev_activ = None
 #
-# for month in raw.keys():
+for month in raw.keys():
+
+    df_month = raw[month]
+
+    for index, row in df_month.iterrows():
+
+        if index == "":
+            continue
+
+        daily_totals = dict(zip(legend, [0]*len(legend)))
+        daily_log = []
+
+        for n in range(1, len(row)):
+
+            cell = word_processor(list(row)[n])
+
+            if cell:
+
+                daily_totals[cell] += 0.5
+                last_cell = cell
+                daily_log.append(cell)
+
+            else:
+
+                daily_totals[last_cell] += 0.5
+                daily_log.append(last_cell)
+
+        totals[index] = daily_totals
+        master[index] = daily_log
+
+master_df = pd.DataFrame.from_dict(master)
+master_df = master_df.transpose()
+master_df.sort_index(inplace=True)
+
+totals_df = pd.DataFrame.from_dict(totals, orient='index')
+totals_df.sort_index(inplace=True)
+#totals_df = totals_df.transpose()
+
+now = datetime.datetime.now()
+outname = out_loc + "/" + "master_log_" + now.strftime('%Y%m%d%H%M') + ".xlsx"
+
+with pd.ExcelWriter(outname) as writer:
+    master_df.to_excel(writer, sheet_name="Master Log")
+    totals_df.to_excel(writer, sheet_name="Daily Totals")
 #
 #     end_flag = False
 #

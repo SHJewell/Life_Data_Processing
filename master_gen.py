@@ -16,7 +16,7 @@ import string
 
 import pprint
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def date_processor(obj):
 #returns a datetime.date object
@@ -31,16 +31,16 @@ def date_processor(obj):
         out = datetime.date(int(obj[0:4]),int(obj[4:6]),int(obj[6:8]))
         return out
     
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
             
 def daily_totals(calendar):
-#gives activity totals by day
+# gives activity totals by day
     
     cats = set()
     act_totals = {}
     
-    #generate categories
-    #this is not a terribly efficient, but very general
+    # generate categories
+    # this is not a terribly efficient, but very general
     for day in calendar:
         
         for cat in calendar[day]:
@@ -61,9 +61,9 @@ def daily_totals(calendar):
     
     return act_totals
 
-#==============================================================================
-#cleans up strings, removing leading and following spaces, carriage returns and
-#changing to lower case
+# ==============================================================================
+# cleans up strings, removing leading and following spaces, carriage returns and
+# changing to lower case
 
 def word_processor(in_string):
     
@@ -82,7 +82,7 @@ def word_processor(in_string):
     
     return mid.lower()
     
-#==============================================================================
+# ==============================================================================
 
 def col_processing(df):
     
@@ -97,8 +97,9 @@ def col_processing(df):
         
     return df 
 
-#==============================================================================
-#MAIN
+# ==============================================================================
+ #MAIN
+
 
 weight_old = pickle.load(open('older_weights.dat','rb'))
 nutrition = pickle.load(open('nutritional_calendar.dat','rb'))
@@ -108,8 +109,8 @@ weight = pickle.load(open('weight_tracker.dat', "rb"))
 
 daily_activities = daily_totals(calendar)
 
-#------------------------------------------------------------------------------
-#generate frame skeleton
+# ------------------------------------------------------------------------------
+# generate frame skeleton
 
 cal = pd.DataFrame.from_dict(weight,orient='index')
 nutr_frame = pd.DataFrame.from_dict(nutrition,orient='index')
