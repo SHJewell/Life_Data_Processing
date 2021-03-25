@@ -264,13 +264,15 @@ raw = pd.read_excel(filepath, sheet_name=None, usecols='A:AX', index_col="Date",
 # ==============================================================================
 # generate a list of activity catagories
 
-legend = []
+legend = {}
 
-for item in list(raw['January'].iloc[:, 0]) :
+for item in list(raw['January'].iloc[:, 0]):
 
     item = word_processor(item)
     if item:
-        legend.append(item)
+        legend[item] = 0
+
+
 
 #
 # totals = {}
