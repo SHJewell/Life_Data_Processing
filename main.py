@@ -6,9 +6,13 @@ Determine best way to hold data while waiting for button clicks
 
 What information should be displayed in order to determine what new data should be read in to the master
 
+Should probably keep master .dats seperated like the spreadsheets as determing first/last dates from the master
+is a complete mess
+
 '''
 
 import wx
+import pandas as pd
 import daily_log_processing
 
 class MasterTab(wx.Panel):
@@ -19,6 +23,9 @@ class MasterTab(wx.Panel):
 
     Or maybe this will be a summary tab?
     '''
+
+    weight = ['drinks', 'heart', '']
+
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         t = wx.StaticText(self, -1, "hi")
@@ -31,15 +38,26 @@ class LifeTab(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
-        self.read_xls_but = wx.Button(self, -1, "Read log")
+        self.read_xls_but = wx.Button(self, -1, "Import Log")
         self.read_xls_but.Bind(wx.EVT_BUTTON, self.read_log)
+
+        self.start = wx.StaticText()
+        self.stop = wx.StaticText()
+
+    def initFrame(self):
+
+        self.master = pd.read_pickle('E:\Documents\Datasets\Life_Data\Data files\master_calendar.dat')
 
     def read_log(self, event):
 
-        path = MainFrame.getpath(self, "E:/")
-        print(path)
+        self.d_path = MainFrame.getpath(self)
+        #print(self.d_path)
 
-        #master_log, lin_log = daily_log_processing.import_lifelog()
+        self.master_log, self.lin_log = daily_log_processing.import_lifelog(self, self.d_path)
+
+        #print(self.d_path, len(self.master_log))
+
+        return self.master_log, self.lin_log
 
 class FoodTab(wx.Panel):
     '''
@@ -59,6 +77,8 @@ class WeightTab(wx.Panel):
         wx.Panel.__init__(self, parent)
         t = wx.StaticText(self, -1, "hi")
 
+        self.weights = pd.read_pickle('E:\Documents\Datasets\Life_Data\Data files\master_calendar.dat')
+
 class ProcessTab(wx.Panel):
     '''
     Will probably be most complicated,
@@ -73,6 +93,7 @@ class ProcessTab(wx.Panel):
 class MainFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, title="Life Log Processor")
+        wx.SystemOptions.SetOption(u"osx.openfiledialog.always-show-types", "1")
 
         pnl = wx.Panel(self)
         nb = wx.Notebook(pnl)
@@ -93,15 +114,24 @@ class MainFrame(wx.Frame):
         sizer.Add(nb, 1, wx.EXPAND)
         pnl.SetSizer(sizer)
 
-    def getpath(self, default):
-        openFileDialog = wx.FileDialog(self,
-                                       "Open spreadsheet",
-                                       "", "",
-                                       "Excel files (*.xls, *.xlsx)|*.xls, *xlsx",
-                                       wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+    def getpath(self):
 
-        openFileDialog.ShowModal()
-        return openFileDialog.GetPath()
+        # naming the parameters breaks this because, fuck you right?
+        fileDialog = wx.FileDialog(self,
+                                   "Open spreadsheet",
+                                   "",
+                                   "E:\\Documents\\Datasets\\Life_Data",
+                                   "Excel files (*.xlsx)|*.xlsx|" \
+                                   "All files (*.*)|*.*",
+                                   wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+
+        if fileDialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        # pathname = fileDialog.GetPath()
+
+        # return pathname
+        return fileDialog.GetPath()
 
 class LifeLogApp(wx.App):
     def OnInit(self):
@@ -109,6 +139,8 @@ class LifeLogApp(wx.App):
         self.SetTopWindow(frame)
         frame.Show()
         return 1
+
+
 
 if __name__ == "__main__":
 
