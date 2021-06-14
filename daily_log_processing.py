@@ -7,6 +7,7 @@ Created on Sat Oct 10 13:44:50 2020
 
 TODO:
 Change to integrate with GUI
+
     Need start/stop dates
     Missing times?
 
