@@ -156,7 +156,7 @@ def process_raw(raw):
               'November'    :   11,
               'December'    :   12}
 
-    cur_year = (datetime.datetime.tody()).year
+    cur_year = (datetime.datetime.today()).year
 
     linear = {}
 

@@ -47,7 +47,7 @@ class LifeTab(wx.Panel):
     def initFrame(self):
 
         self.master = pd.read_pickle('E:\Documents\Datasets\Life_Data\Data files\master_calendar.dat')
-        self.start.SetLabel(str(self.master.max())
+        self.start.SetLabel(str(self.master.max()))
 
     def read_log(self, event):
 
