@@ -11,19 +11,36 @@ def word_processor(string):
     if (string in ["", None]) or (len(string) == 0):
         return
 
-    mid = string.replace("\\n","")
-    mid = mid.replace("\n","")
-    mid = mid.replace("&","and")
+    mid = string.replace("\\n", "")
+    mid = mid.replace("\n", "")
+    mid = mid.replace("&", "and")
 
     if (mid in ["", None]) or (len(mid) == 0):
         return
 
     mid = mid.strip()
 
+    if mid[-1] == "s":
+        mid = mid[:-1]
+
     if mid in ["", None]:
         return
     else:
         return mid.lower()
+
+
+def get_year(path):
+    import re
+    '''
+    pulls year out of file path
+    :return: int of year
+    '''
+
+    m = re.search('([1-3][0-9]{3})', path)
+
+    year = int(m.group(0))
+
+    return year
 
 # def read_excel(path, sheet, )
 #

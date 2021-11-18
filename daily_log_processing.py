@@ -19,27 +19,19 @@ Data structures:
 
 
 TODO:
-    Combine day and time for linear
-    Each Daily class should contain one year (or less)
-        Class should have the following methods:
-            Create new year
-            Read old pickled year
-            Make datetime index
-            Append new data
-                Will need to determine how to deal with partially filled months
-            Export master
-                As .csv
-                As pickle
-            Export linear
-                As pickle
-                As .csv?
+    Class should have the following methods:
+        Read old pickled year
+        Append new data
+            Will need to determine how to deal with partially filled months
+        Export master
+            As .csv
+        Export linear
+            As .csv?
     External function should call Daily class, append for each month
         File opener?
             .csv
             .xlm
             pickle
-        String processing
-        Date processing
 
 """
 
@@ -61,7 +53,7 @@ class dailyLog:
         self.missing_dates = set()
 
         if path != None:
-            self.year = self.gen_year()
+            self.year = utils.get_year(self.path)
             self.data, self.linear = self.import_new_log()
 
     def import_new_log(self):
@@ -84,18 +76,6 @@ class dailyLog:
         self.linear.index = pd.to_datetime(self.linear.index.get_level_values(0).astype('str') + ' ' + self.linear.index.get_level_values(1).astype('str'))
 
         return self.data, self.linear
-
-    def get_year(self):
-        '''
-        pulls year out of file path
-        :return: int of year
-        '''
-
-        m = re.search('([1-3][0-9]{3})', self.path)
-
-        self.year = int(m.group(0))
-
-        return self.year
 
 
     def gen_missing_dates(self):
@@ -165,7 +145,7 @@ class dailyLog:
 
 if __name__ == '__main__':
     path = 'E:\Documents\Datasets\Life Data\\2020 sheets\\Daily log 2020.xlsx'
-    write_path = 'E:\Documents\Datasets\Life Data\Data files\'
+    write_path = 'E:\Documents\Datasets\Life Data\Data files\\'
     #path = 'E:\Documents\Datasets\Life Data\\2021 sheets\\daily log 2021.xlsx'
 
     new_log = dailyLog(path)
