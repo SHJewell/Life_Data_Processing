@@ -5,6 +5,8 @@ Created on Sat Aug  8 16:38:37 2020
 @author: Scott
 
 TODO:
+    Current:
+        Creating and adding daily nutrition tallies
     General
     New Year:
         Maybe have the ability to add individual months instead of whole years
@@ -50,15 +52,35 @@ class foodTracker:
             #self.year = utils.get_year(self.filepath) how do we get year?
             self.eating_log = self.gen_new_log()
 
+
     def import_month(self, filepath):
 
         month = pd.read_excel(self.file_path + filepath, sheet_name=None)
 
-        for week in month.items():
+        for name in month:
 
+            if 'week' in name.lower():
 
+                week = month[name]
 
-            breakpoint()
+                for dayN in range(0, len(week.columns), 2):
+
+                    days_nutrition = {'calories (kCal)':    0,
+                                      'carbs (g)':          0,
+                                      'fats (g)':           0,
+                                      'fiber (g)':          0,
+                                      'sugar (g)':          0
+                                      }
+
+                    date = week.columns[dayN].date()
+                    day = week.iloc[1:, dayN:(dayN+2)].dropna()
+                    day.iloc[:, 0].apply(utils.word_processor).str.replace(' ', '')
+
+                    for item in (day.dropna()).itertuples():
+
+                        if item in self.food_list.index:
+
+                            breakpoint()
 
 
     def gen_new_log(self):
@@ -87,8 +109,8 @@ class foodTracker:
     def import_food_master_from_sheet(self):
 
         self.food_list = pd.read_csv(self.master_food_path)
-        self.food_list.applymap(utils.word_processor)
         self.food_list.index = self.food_list['food'].apply(utils.word_processor).str.replace(' ', '')
+        self.food_list.fillna(0)
 
         return self.food_list
 

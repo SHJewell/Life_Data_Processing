@@ -1,13 +1,14 @@
 
 '''
+General Structure
+    Daily log, food and weight tracker modules should only deal with one year at a time.
+        For large analysis, a dedicated module should be used
+
 TODO:
-
-Determine best way to hold data while waiting for button clicks
-
-What information should be displayed in order to determine what new data should be read in to the master
-
-Should probably keep master .dats seperated like the spreadsheets as determing first/last dates from the master
-is a complete mess
+    Determine best way to hold data while waiting for button clicks
+    What information should be displayed in order to determine what new data should be read in to the master
+    Should probably keep master .dats seperated like the spreadsheets as determing first/last dates from the master
+    is a complete mess
 
 '''
 
