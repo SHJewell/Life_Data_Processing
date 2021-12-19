@@ -38,7 +38,11 @@ class foodTracker:
         self.file_path = path
         self.master_food_path = food_master
         self.eating_log = {}
-        self.nutrition_data = pd.DataFrame
+        self.nutrition_data = pd.DataFrame(columns=['calories (kCal)',
+                                                    'carbs (g)',
+                                                    'fats (g)',
+                                                    'fiber (g)',
+                                                    'sugar (g)'])
         self.food_list = pd.DataFrame
         self.reported_dates = pd.Series
         self.missing_dates = set()
@@ -72,15 +76,24 @@ class foodTracker:
                                       'sugar (g)':          0
                                       }
 
-                    date = week.columns[dayN].date()
                     day = week.iloc[1:, dayN:(dayN+2)].dropna()
                     day.iloc[:, 0].apply(utils.word_processor).str.replace(' ', '')
 
                     for item in (day.dropna()).itertuples():
 
-                        if item in self.food_list.index:
+                        if item._1 in self.food_list.index:     # itertubples produces a pandas frame, where columsn are _n
 
-                            breakpoint()
+                            for nutrient in days_nutrition:
+
+                                try:
+                                    days_nutrition[nutrient] += float(self.food_list.loc[item._1][nutrient])
+                                except TypeError:
+                                    self.errors.append(str(week.columns[dayN].date()) + ', ' + item._1 + ', ' + nutrient)
+
+                    days_nutrition['Date'] = week.columns[dayN].date()
+                    self.nutrition_data.append(days_nutrition, ignore_index=True)
+
+        return
 
 
     def gen_new_log(self):
@@ -110,15 +123,18 @@ class foodTracker:
 
         self.food_list = pd.read_csv(self.master_food_path)
         self.food_list.index = self.food_list['food'].apply(utils.word_processor).str.replace(' ', '')
-        self.food_list.fillna(0)
+        self.food_list.fillna(0, inplace=True)
 
         return self.food_list
 
 
 if __name__ == '__main__':
 
-    path = 'E:\Documents\Datasets\Life Data\\2020 sheets\\'
-    master_path = 'E:\Documents\Datasets\Life Data\\Spreadsheets\\master food list.csv'
+    # path = 'E:\Documents\Datasets\Life Data\\2020 sheets\\'
+    # master_path = 'E:\Documents\Datasets\Life Data\\Spreadsheets\\master food list.csv'
+    path = 'C:\Datasets\Life Data\\2020\\'
+    master_path = 'C:\Datasets\Life Data\Other\master food list.csv'
+
 
     foodlog = foodTracker(path=path, food_master=master_path)
 
