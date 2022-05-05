@@ -6,16 +6,16 @@ Created on Fri Jan  1 12:23:24 2021
 template writer produces templates of log files to fill in
 
 TODO
-
-can convert dataframes to openpyxl workbooks, then do the formatting
-need format template to draw from
+    Formatting still needs work
+        colors and conditional formatting doesn't transfer
+        Column widths need to be narrower
 
 """
 
 import pandas as pd
 import openpyxl as pxl
 
-year = 2021
+year = 2022
     
 activities = ["Friends",
              "Family",
@@ -56,7 +56,7 @@ def write_wt(year):
                   'Sleep', 
                   'Energy', 
                   'Mental', 
-                  'Mental',
+                  'Mood',
                   'Heart',
                   'Poop?',
                   'Drinks',
@@ -78,12 +78,12 @@ def write_wt(year):
         strt = str(year) + "-" + str(month.month) + '-01'
         stp = str(year) + "-" + str(month.month) + "-" + str(num_days)
         
-        days = pd.date_range(start=strt,end=stp,freq='D')
+        days = pd.date_range(start=strt, end=stp, freq='D')
         days = days.date
         temp = pd.DataFrame(index=days,columns=col_titles)
         weight_sheets[month.month_name()] = temp
         
-    name = str(year) + " sheets//" + str(year) + " weight tracker.xlsx" 
+    name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + str(year) + " weight tracker.xlsx"
             
     writer = pd.ExcelWriter(name, date_format='mm/dd')
     
@@ -148,7 +148,7 @@ def write_ft(year):
         
     for mo_sheet in monthly_sheets:
         
-        name = str(year) + " sheets//" + str(year) + " " + mo_sheet + " food tracker.xlsx" 
+        name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + str(year) + " " + mo_sheet + " food tracker.xlsx"
         writer = pd.ExcelWriter(name, date_format='mm/dd')
         
         for week_sheet in monthly_sheets[mo_sheet]:
@@ -180,7 +180,7 @@ def write_ft(year):
 #daily log
 def write_dl(year,activities):
     
-    time = [100]
+    time = ['100']
     
     for n in range(1,48):
         
@@ -211,13 +211,13 @@ def write_dl(year,activities):
         temp = pd.DataFrame(index=days,columns=time)
         daily_log[month.month_name()] = temp
         
-    name = str(year) + " sheets//" + "daily log " + str(year) + ".xlsx" 
+    name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + "daily log " + str(year) + ".xlsx"
 
-    writer = pd.ExcelWriter(name, date_format='mm/dd')
+    writer = pd.ExcelWriter(name, date_format='mm/dd', mode='w')
     
     for mnth in daily_log:
 
-        daily_log[mnth].to_excel(writer,sheet_name=mnth,index_label="date",freeze_panes=(1,1))
+        daily_log[mnth].to_excel(writer,sheet_name=mnth, index_label="date", freeze_panes=(1,1))
         
     writer.save()
     
@@ -229,7 +229,7 @@ def write_dl(year,activities):
             sheet.cell(row=rowy+1, column=1, value=value)
      
     #will need to     
-    template = "daily template.xlsx"
+    template = "E:\Documents\Datasets\Life Data\Spreadsheets\daily template.xlsx"
     
     x = pxl.load_workbook(template)
     y = pxl.load_workbook(name)
@@ -243,20 +243,24 @@ def write_dl(year,activities):
         for attr in list(dir(wb)):
             
             try:
-                setattr(y_cf,attr,getattr(wb,attr))
+                setattr(y_cf, attr, getattr(wb, attr))
             except:
                 print(str(attr) + " cannot be written")
         
         if str(attr)[0] == "_":
             continue
         
-        add_column(y[month],activities)
-        
-    for col in listx['template']:
-        
-        
+        add_column(y[month], activities)
+
+        #for col in list(x['template'])[0]:
+
+        #print(col)
+
     y.save(name)
 
-#write_wt(year)
-#write_ft(year)
-write_dl(year,activities)
+if __name__ == '__main__':
+
+
+    write_wt(year)
+    write_ft(year)
+    #write_dl(year, activities)

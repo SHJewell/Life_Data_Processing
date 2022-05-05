@@ -137,8 +137,6 @@ class dailyLog:
             pickle.dump(data, a)
 
 
-
-
     def return_data(self):
 
         return self.data
