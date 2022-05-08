@@ -6,15 +6,17 @@ Created on Sat Aug  8 16:38:37 2020
 
 TODO:
     Current:
-        Creating and adding daily nutrition tallies
+        Food master filled through 2020
     General
+        Missing dates needs to be calculated
+        Doesn't deal with duplicates in the food master file
+        Writes skipped days as zeros, should be nans
     New Year:
         Maybe have the ability to add individual months instead of whole years
         Loop through months
             Loops will almost certainly be necessary, I don't see a way to do this without them
             Turn into ... dict? using date objects
             Convert to cals, etc per day
-        Read master food list
 
 """
 
@@ -29,37 +31,37 @@ import re
 #import tk
 import utils
 
+import logging
+
 import pprint
+
+logging.basicConfig(filename='E:\Documents\Datasets\Life Data\Logs\\food_concat_log.txt', level=logging.DEBUG)
 
 
 class foodTracker:
-    def __init__(self, path=None, food_master=None):
+    def __init__(self, path=None):
         self.today = datetime.datetime.today()
         self.file_path = path
-        self.master_food_path = food_master
-        self.eating_log = {}
-        self.nutrition_data = pd.DataFrame(columns=['calories (kCal)',
-                                                    'carbs (g)',
-                                                    'fats (g)',
-                                                    'fiber (g)',
-                                                    'sugar (g)'])
-        self.food_list = pd.DataFrame
-        self.reported_dates = pd.Series
+        self.eating_log = {}        #???
+        self.nutrition_calendar = pd.DataFrame
+        self.food_master = pd.DataFrame
+        self.reported_dates = set()
         self.missing_dates = set()
         self.year = None
         self.errors = []
-
-        if food_master != None:
-            self.food_list = self.import_food_master_from_sheet()
-
-        if path != None:
-            #self.year = utils.get_year(self.filepath) how do we get year?
-            self.eating_log = self.gen_new_log()
+        self.missing_food = []
 
 
     def import_month(self, filepath):
+        '''
+        Loops through month sheet fed by gen_new_log()
+        :param filepath:
+        :return None, updates self.nutrition_calendar:
+        '''
 
         month = pd.read_excel(self.file_path + filepath, sheet_name=None)
+
+        months_nutr = {}
 
         for name in month:
 
@@ -69,6 +71,8 @@ class foodTracker:
 
                 for dayN in range(0, len(week.columns), 2):
 
+                    report_flag = False
+
                     days_nutrition = {'calories (kCal)':    0,
                                       'carbs (g)':          0,
                                       'fats (g)':           0,
@@ -76,70 +80,150 @@ class foodTracker:
                                       'sugar (g)':          0
                                       }
 
+                    try:
+                        date = week.columns[dayN].date()
+                    except AttributeError:
+                        date = datetime.datetime.strptime(week.columns[dayN][:-2], '%Y-%m-%d %H:%M:%S').date()
+
                     day = week.iloc[1:, dayN:(dayN+2)].dropna()
-                    day.iloc[:, 0].apply(utils.word_processor).str.replace(' ', '')
+                    #day.iloc[:, 0].apply(utils.word_processor).str.replace(' ', '')
 
-                    for item in (day.dropna()).itertuples():
+                    for item in day.itertuples():
 
-                        if item._1 in self.food_list.index:     # itertubples produces a pandas frame, where columsn are _n
+                        report_flag = True
+                        food = utils.word_processor(item[1])
 
-                            for nutrient in days_nutrition:
+                        if food in self.food_master.index:
 
+                            food_deets = self.food_master.loc[food, :].to_dict()
+
+                            logging.debug('FOUND Date: ' + str(date) + ' ' + 'Item: ' + item[1] + ' as ' + food)
+
+                            for item_key, amount in days_nutrition.items():
+
+                                #problem with two instance of single item. Should be cleaned up on import
                                 try:
-                                    days_nutrition[nutrient] += float(self.food_list.loc[item._1][nutrient])
+                                    days_nutrition[item_key] = amount + item[2]*float(food_deets[item_key])
+
                                 except TypeError:
-                                    self.errors.append(str(week.columns[dayN].date()) + ', ' + item._1 + ', ' + nutrient)
+                                    logging.debug(food + ' is a duplicate')
+                                    self.errors.append(food + ' is a duplicate')
+                                    days_nutrition[item_key] = amount + item[2]*float(food_deets[item_key][item[1]])
 
-                    days_nutrition['Date'] = week.columns[dayN].date()
-                    self.nutrition_data.append(days_nutrition, ignore_index=True)
+                        else:
 
-        return
+                            self.missing_food.append([item[1], date])
+                            logging.debug('NOT FOUND Date: ' + str(date) + ' ' + 'Item: |' + item[1] + '|')
+
+
+
+                    if report_flag:
+                        self.reported_dates.add(date)
+                        months_nutr[date] = days_nutrition
+
+        return months_nutr
+
+
+    def export_logs(self, path):
+
+        with open(path + '\\' + str(self.year) + '_food_port_log.txt', 'w+') as w:
+
+            w.write('Errors\n')
+
+            for line in self.errors:
+
+                w.write(line)
+                w.write('\n')
+
+            w.write('Missing Dates\n')
+
+            for date in self.missing_dates:
+
+                w.write(str(date))
+                w.write('\n')
+
+        with open(path + '\\' + str(self.year) + '_missing_food.txt', 'w+') as w:
+
+            for food, date in self.missing_food:
+
+                w.write(str(date) + ': ' + food + '\n')
 
 
     def gen_new_log(self):
-
-        # month_opts = []
-        #
-        # for n in range(1, 12):
-        #     month = datetime.datetime.strptime(str(n), '%m')
-        #     month_opts.append((month.strftime('%b')).lower())
-        #     month_opts.append((month.strftime('%B')).lower())
+        '''
+        Loops though months in year, and feeds existing food tracking sheets to import_month()
+        :return:
+        '''
 
         for file in os.listdir(self.file_path):
+
+            if '~' in file or '#' in file:
+                continue
 
             if 'food' in file.lower():
 
                 file_year = utils.get_year(file)
 
-                if self.year is not None and file_year != self.year:
+                if self.year is None:
+
+                    self.year = file_year
+
+                elif self.year is not None and file_year != self.year:
 
                     self.errors.append("Years do not match!")
                     self.year = file_year
 
-                self.import_month(file)
+                month = self.import_month(file)
+
+                try:
+                    self.nutrition_calendar = pd.concat(
+                        [self.nutrition_calendar, pd.DataFrame(month).transpose()])
+                except TypeError:
+                    self.nutrition_calendar = pd.DataFrame(month).transpose()
 
 
-    def import_food_master_from_sheet(self):
+    def import_food_master(self, path):
+        '''
+        Import master food list
+        updates self.food_master
+        :param path:
+        :return:
+        '''
 
-        self.food_list = pd.read_csv(self.master_food_path)
-        self.food_list.index = self.food_list['food'].apply(utils.word_processor).str.replace(' ', '')
-        self.food_list.fillna(0, inplace=True)
+        self.food_master = pd.read_excel(path)
+        self.food_master.index = self.food_master['food'].apply(utils.word_processor)
 
-        return self.food_list
+        if len(self.food_master.columns) > 8:
+            self.food_master.drop(self.food_master.columns[8:], axis='columns', inplace=True)
+
+        self.food_master.replace({'\n': '', '\r': ''}, regex=True, inplace=True)
+        self.food_master.replace('', 0, inplace=True)
+        self.food_master.fillna(0, inplace=True)
+        self.food_master.drop_duplicates(subset='food', keep='first', inplace=True)
+
+
+    def export_as_dat(self, path):
+
+        self.nutrition_calendar.to_pickle(path + '\\' + str(self.year) + '_nutr_cal.dat')
+
+    def export_as_csv(self, path):
+
+        self.nutrition_calendar.to_csv(path + '\\' + str(self.year) + '_nutr_cal.csv')
 
 
 if __name__ == '__main__':
 
-    # path = 'E:\Documents\Datasets\Life Data\\2020 sheets\\'
-    # master_path = 'E:\Documents\Datasets\Life Data\\Spreadsheets\\master food list.csv'
-    path = 'C:\Datasets\Life Data\\2020\\'
-    master_path = 'C:\Datasets\Life Data\Other\master food list.csv'
+    path = 'E:\Documents\Datasets\Life Data\\2022 sheets\\'
+    master_path = 'E:\Documents\Datasets\Life Data\\Spreadsheets\\master food list.xlsx'
 
+    foodlog = foodTracker(path=path)
+    foodlog.import_food_master(master_path)
+    foodlog.gen_new_log()
+    foodlog.export_logs('E:\Documents\Datasets\Life Data\Logs')
+    foodlog.export_as_csv('E:\Documents\Datasets\Life Data\Logs')
+    #foodlog.export_as_dat('E:\Documents\Datasets\Life Data\Data files')
 
-    foodlog = foodTracker(path=path, food_master=master_path)
-
-    breakpoint()
-
+    # breakpoint()
 
 # #==============================================================================
 # #constants
