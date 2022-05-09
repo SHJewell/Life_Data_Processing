@@ -8,11 +8,19 @@ TODO:
 
 
 import dearpygui.dearpygui as dpg
+import datetime
+
+import food_concatenator as fcc
+import daily_log_processing as dlp
+import weight_parser as wp
 
 dpg.create_context()
 
 data_path = f'E:\Documents\Datasets'
 
+food = fcc.foodTracker
+weight = wp.weightLog
+activies = dlp.dailyLog
 
 with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
     with dpg.tab_bar():
@@ -33,13 +41,11 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                     return
 
                 def nutr_file(path):
-                    print('Empty function!')
-                    return
+                    food.import_food_master(path)
 
                 def wt_read(path):
                     print('Empty function!')
                     return
-
 
                 return {'daily_log':        dl_read,
                         'food_log':         food_read,
@@ -63,7 +69,18 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
         with dpg.tab(label='Food Log'):
             dpg.add_text('Food Log')
             dpg.add_button(label='Read Food Log', callback=open_file, user_data='food_log')
-            dpg.add_button(lable='Read Nutritional Info', callback=open_file, user_data='nutr_file')
+            dpg.add_button(label='Read Nutritional Info', callback=open_file, user_data='nutr_file')
+
+        with dpg.add_tab_bar(label='food_tabs', tag='food_tabs'):
+
+            with dpg.tab(label='Eating Calendar', parent='food_tabs'):
+
+                dpg.add_date_picker(label='food_calendar', tag='food_cal')
+
+            with dpg.tab(label='Nutrition Information', parent='food_tabs'):
+
+                dpg.add_table(label='Nutrition Information', tag='nutr_info')
+
 
         with dpg.tab(label='Weight Tracker'):
             dpg.add_text('Weight Tracker')

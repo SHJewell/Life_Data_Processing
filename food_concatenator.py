@@ -35,7 +35,7 @@ import logging
 
 import pprint
 
-logging.basicConfig(filename='E:\Documents\Datasets\Life Data\Logs\\food_concat_log.txt', level=logging.DEBUG)
+#logging.basicConfig(filename='E:\Documents\Datasets\Life Data\Logs\\food_concat_log.txt', level=logging.DEBUG)
 
 
 class foodTracker:
@@ -97,7 +97,7 @@ class foodTracker:
 
                             food_deets = self.food_master.loc[food, :].to_dict()
 
-                            logging.debug('FOUND Date: ' + str(date) + ' ' + 'Item: ' + item[1] + ' as ' + food)
+                            #logging.debug('FOUND Date: ' + str(date) + ' ' + 'Item: ' + item[1] + ' as ' + food)
 
                             for item_key, amount in days_nutrition.items():
 
@@ -106,14 +106,14 @@ class foodTracker:
                                     days_nutrition[item_key] = amount + item[2]*float(food_deets[item_key])
 
                                 except TypeError:
-                                    logging.debug(food + ' is a duplicate')
+                                    #logging.debug(food + ' is a duplicate')
                                     self.errors.append(food + ' is a duplicate')
                                     days_nutrition[item_key] = amount + item[2]*float(food_deets[item_key][item[1]])
 
                         else:
 
                             self.missing_food.append([item[1], date])
-                            logging.debug('NOT FOUND Date: ' + str(date) + ' ' + 'Item: |' + item[1] + '|')
+                            #logging.debug('NOT FOUND Date: ' + str(date) + ' ' + 'Item: |' + item[1] + '|')
 
 
 
@@ -211,16 +211,16 @@ class foodTracker:
         self.nutrition_calendar.to_csv(path + '\\' + str(self.year) + '_nutr_cal.csv')
 
 
-if __name__ == '__main__':
-
-    path = 'E:\Documents\Datasets\Life Data\\2022 sheets\\'
-    master_path = 'E:\Documents\Datasets\Life Data\\Spreadsheets\\master food list.xlsx'
-
-    foodlog = foodTracker(path=path)
-    foodlog.import_food_master(master_path)
-    foodlog.gen_new_log()
-    foodlog.export_logs('E:\Documents\Datasets\Life Data\Logs')
-    foodlog.export_as_csv('E:\Documents\Datasets\Life Data\Logs')
+# if __name__ == '__main__':
+#
+#     path = 'E:\Documents\Datasets\Life Data\\2022 sheets\\'
+#     master_path = 'E:\Documents\Datasets\Life Data\\Spreadsheets\\master food list.xlsx'
+#
+#     foodlog = foodTracker(path=path)
+#     foodlog.import_food_master(master_path)
+#     foodlog.gen_new_log()
+#     foodlog.export_logs('E:\Documents\Datasets\Life Data\Logs')
+#     foodlog.export_as_csv('E:\Documents\Datasets\Life Data\Logs')
     #foodlog.export_as_dat('E:\Documents\Datasets\Life Data\Data files')
 
     # breakpoint()
