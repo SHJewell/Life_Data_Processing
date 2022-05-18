@@ -8,10 +8,18 @@ TODO:
 
 
 import dearpygui.dearpygui as dpg
+from daily_log_processing import dailyLog as dl
+from weight_parser import weightLog as wl
+from food_concatenator import foodTracker as ft
 
 dpg.create_context()
 
 data_path = f'E:\Documents\Datasets'
+
+# initialize our log objects
+daily_log = dl()
+weight_log = wl()
+food_log = ft()
 
 
 with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
@@ -24,22 +32,23 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                 # print(what[0])
                 # dpg.set_value(user_data, what[0])
 
-                def dl_read(path):
+                def dl_read(log_path):
+                    kl = list(log_path['selections'].keys())
+                    print(log_path['selections'][kl[0]])
+                    daily_log.import_new_log(path=log_path['selections'][kl[0]])
+                    dpg.set_value('dl_miss_days', daily_log.ret_missing_dates())
+
+                def food_read(log_path):
                     print('Empty function!')
                     return
 
-                def food_read(path):
+                def nutr_file(log_path):
                     print('Empty function!')
                     return
 
-                def nutr_file(path):
+                def wt_read(log_path):
                     print('Empty function!')
                     return
-
-                def wt_read(path):
-                    print('Empty function!')
-                    return
-
 
                 return {'daily_log':        dl_read,
                         'food_log':         food_read,
@@ -60,10 +69,16 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             dpg.add_text('Daily Log')
             dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
 
+            dpg.add_table(label='Missing Days', tag='dl_miss_days')
+            #dpg.add_date_picker(tag='dl_calendar')
+            dpg.add_table(label='Activity Totals', tag='dl_totals')
+
         with dpg.tab(label='Food Log'):
             dpg.add_text('Food Log')
             dpg.add_button(label='Read Food Log', callback=open_file, user_data='food_log')
-            dpg.add_button(lable='Read Nutritional Info', callback=open_file, user_data='nutr_file')
+            dpg.add_button(label='Read Nutritional Info', callback=open_file, user_data='nutr_file')
+
+            dpg.add_table(label='Missing Foods')
 
         with dpg.tab(label='Weight Tracker'):
             dpg.add_text('Weight Tracker')

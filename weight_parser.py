@@ -10,12 +10,6 @@ TODO
 
 import openpyxl
 import pandas as pd
-import datetime
-import csv
-import os
-import pickle
-
-import pprint
 
 class weightLog():
     def __init__(self):
