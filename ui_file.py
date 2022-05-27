@@ -36,7 +36,8 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                     kl = list(log_path['selections'].keys())
                     print(log_path['selections'][kl[0]])
                     daily_log.import_new_log(path=log_path['selections'][kl[0]])
-                    dpg.set_value('dl_miss_days', daily_log.ret_missing_dates())
+
+                    dpg.set_value('dl_missing_days', daily_log.ret_missing_dates())
 
                 def food_read(log_path):
                     print('Empty function!')
@@ -69,7 +70,9 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             dpg.add_text('Daily Log')
             dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
 
-            dpg.add_table(label='Missing Days', tag='dl_miss_days')
+            with dpg.add_table(label='Missing Days', tag='dl_missing_days'):
+                dpg.add_table_column(label='Missing Date')
+
             #dpg.add_date_picker(tag='dl_calendar')
             dpg.add_table(label='Activity Totals', tag='dl_totals')
 
