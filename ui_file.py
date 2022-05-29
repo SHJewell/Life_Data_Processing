@@ -33,11 +33,15 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                 # dpg.set_value(user_data, what[0])
 
                 def dl_read(log_path):
+
                     kl = list(log_path['selections'].keys())
-                    print(log_path['selections'][kl[0]])
+                    # print(log_path['selections'][kl[0]])
                     daily_log.import_new_log(path=log_path['selections'][kl[0]])
 
-                    dpg.set_value('dl_missing_days', daily_log.ret_missing_dates())
+                    for day in daily_log.ret_missing_dates():
+
+                        with dpg.table_row(parent='dl_missing_days'):
+                            dpg.add_text(f'{day}')
 
                 def food_read(log_path):
                     print('Empty function!')
@@ -56,7 +60,7 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                         'nutr_file':        nutr_file,
                         'weight_tracker':   wt_read}.get(user_data)(data)
 
-            with dpg.file_dialog(label="Demo File Dialog", width=600, height=400, show=False, default_path=data_path,
+            with dpg.file_dialog(label="File Dialog", width=600, height=400, show=False, default_path=data_path,
                                  callback=lambda s, a, u: add_file(user_data, a), tag=fd_uid):
                 dpg.add_file_extension(".*")
                 dpg.add_file_extension("", color=(150, 255, 150, 255))
@@ -70,8 +74,9 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             dpg.add_text('Daily Log')
             dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
 
-            with dpg.add_table(label='Missing Days', tag='dl_missing_days'):
-                dpg.add_table_column(label='Missing Date')
+            with dpg.table(header_row=True, policy=dpg.mvTable_SizingStretchProp, borders_outerH=True,
+                           borders_innerV=True, borders_outerV=True, width=300, tag='dl_missing_days'):
+                dpg.add_table_column()
 
             #dpg.add_date_picker(tag='dl_calendar')
             dpg.add_table(label='Activity Totals', tag='dl_totals')
@@ -81,7 +86,13 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             dpg.add_button(label='Read Food Log', callback=open_file, user_data='food_log')
             dpg.add_button(label='Read Nutritional Info', callback=open_file, user_data='nutr_file')
 
-            dpg.add_table(label='Missing Foods')
+            with dpg.table(header_row=True, policy=dpg.mvTable_SizingStretchProp, borders_outerH=True,
+                           borders_innerV=True, borders_outerV=True, width=300, label='Missing Dates'):
+                dpg.add_table_column()
+
+            # with dpg.table(label='Missing Foods'):
+            #     dpg.add_table_column(id='missing_food', label='Missing Days')
+
 
         with dpg.tab(label='Weight Tracker'):
             dpg.add_text('Weight Tracker')

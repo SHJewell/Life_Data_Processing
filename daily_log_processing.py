@@ -19,6 +19,7 @@ Data structures:
 
 
 TODO:
+    Guard against times greater than 2400H
     Class should have the following methods:
         Read old pickled year
         Append new data
@@ -46,18 +47,19 @@ import re
 class dailyLog:
     def __init__(self, path=None):
         self.today = datetime.datetime.today()
-
+        self.path = path
+        self.data = pd.DataFrame
         self.linear = pd.Series
         self.reported_dates = pd.Series
         self.missing_dates = set()
 
         if path:
             self.year = utils.get_year(self.path)
-            self.data, self.linear = self.import_new_log()
             self.data, self.linear = self.import_new_log(path=self.path)
         else:
             self.data = pd.DataFrame
             self.path = None
+
 
     def import_new_log(self, **kwargs):
         '''
@@ -77,8 +79,8 @@ class dailyLog:
         data.drop(data.loc[:, data.columns.astype(int) >= 2500], axis=1, inplace=True) # drop any times > 2400
         data.columns = self.list_times()                    # re-index for times, rationalizes
         data = data[data.index.notnull()]                   # drop any null dates
-        data.dropna(thresh=13)                              # drop empty rows
-        self.data = data.ffill(axis='columns')         # fill in half-hour gaps
+        data.dropna(thresh=13, inplace=True)                              # drop empty rows
+        self.data = data.ffill(axis='columns')              # fill in half-hour gaps
 
         self.data.applymap(utils.word_processor)            # unifies string format in all cells
 
@@ -91,7 +93,7 @@ class dailyLog:
 
     def ret_missing_dates(self):
         '''
-        I did this a different way ealier, and I don't know why.
+        I did this a different way earlier, and I don't know why.
         Also, it didn't work
 
         :return: set of missing days
@@ -122,10 +124,6 @@ class dailyLog:
     def list_times(self):
         '''
         Generates a list of datetime.times for every half hour of the day
-        TODO:
-            Use input column headers to adaptively set times (eg so can increment by 15 vs 30)
-
-        :return: list of datetime.datetime
         '''
 
         times = ['%s:%s' % (h, m) for h in ([0] + list(range(1, 24))) for m in ('00', '30')]
@@ -142,7 +140,7 @@ class dailyLog:
         Writes pickle repository.
         TODO:
             make write_path a proper variable
-        :return: n/a
+        :return:
         '''
 
         master_name = write_path + 'dailylog' + self.year + '.dat'
