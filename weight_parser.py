@@ -10,6 +10,7 @@ TODO
 
 import openpyxl
 import pandas as pd
+import utils
 
 class weightLog():
     def __init__(self):
@@ -19,6 +20,7 @@ class weightLog():
         self.missing_dates = set()
         self.year = None
         self.errors = []
+        self.path = None
 
     def read_log(self, path):
         '''
@@ -29,6 +31,7 @@ class weightLog():
         :return:
         '''
 
+        self.path = path
         temp = pd.read_excel(path, sheet_name=None)
         emerge = []
         amerge = []
@@ -69,6 +72,8 @@ class weightLog():
         self.daily_ex.fillna(method='backfill', inplace=True)
         self.daily_ex.sort_values(by='date', ascending=False, inplace=True)
 
+        self.year = utils.get_year(path)
+
         return
 
 
@@ -80,6 +85,10 @@ class weightLog():
     def ret_ex(self):
 
         return self.daily_ex
+
+    def ret_date(self):
+
+        return self.year
 
 
 #loc = "E:/Documents/Coding/Life Data Processing/2020 sheets"

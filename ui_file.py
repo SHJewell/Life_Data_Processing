@@ -1,6 +1,5 @@
 '''
 TODO:
-    How to pass sender data to file dialog
     Format tabs
     Figure out I/O layout
     Graphs!
@@ -24,6 +23,9 @@ food_log = ft()
 
 with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
     with dpg.tab_bar():
+
+########################################################################################################################
+
         def open_file(sender, app_data, user_data):
             fd_uid = dpg.generate_uuid()
 
@@ -40,8 +42,15 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
 
                     for day in daily_log.ret_missing_dates():
 
+                        dpg.add_table_row(parent='dl_missing_days')
                         with dpg.table_row(parent='dl_missing_days'):
+                            #dpg.add_table_cell()
+                            # with dpg.table_cell():
                             dpg.add_text(f'{day}')
+
+                    dpg.add_table_row(parent='io_dl_col')
+                    with dpg.table_row(parent='io_dl_col'):
+                        dpg.add_text(f'{daily_log.ret_date()}')
 
                 def food_read(log_path):
                     print('Empty function!')
@@ -70,39 +79,104 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
 
             dpg.show_item(fd_uid)
 
+########################################################################################################################
+
         with dpg.tab(label='Daily Log'):
+            '''
+            Daily Log Tab
+
+            TODO:
+                Import Daily log
+            '''
+
             dpg.add_text('Daily Log')
             dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
 
-            with dpg.table(header_row=True, policy=dpg.mvTable_SizingStretchProp, borders_outerH=True,
-                           borders_innerV=True, borders_outerV=True, width=300, tag='dl_missing_days'):
-                dpg.add_table_column()
+
+
+            with dpg.collapsing_header(label='Missing Dates'):
+                with dpg.table(borders_outerH=True, scrollY=True, reorderable=True, height=400,
+                               borders_innerV=True, borders_outerV=True, width=200, tag='dl_missing_days'):
+                    dpg.add_table_column()
 
             #dpg.add_date_picker(tag='dl_calendar')
             dpg.add_table(label='Activity Totals', tag='dl_totals')
 
+########################################################################################################################
+
         with dpg.tab(label='Food Log'):
+            '''
+            Food Log
+            
+            TODO:
+                Show what items and dates don't have nutritional information
+                How do deal with one log but not another ready...
+            '''
             dpg.add_text('Food Log')
             dpg.add_button(label='Read Food Log', callback=open_file, user_data='food_log')
             dpg.add_button(label='Read Nutritional Info', callback=open_file, user_data='nutr_file')
 
-            with dpg.table(header_row=True, policy=dpg.mvTable_SizingStretchProp, borders_outerH=True,
-                           borders_innerV=True, borders_outerV=True, width=300, label='Missing Dates'):
-                dpg.add_table_column()
+            with dpg.collapsing_header(label='Missing Dates'):
+                with dpg.table(borders_outerH=True, scrollY=True, sortable=True, height=400,
+                               borders_innerV=True, borders_outerV=True, width=200, tag='fl_missing_days'):
+                    dpg.add_table_column()
 
             # with dpg.table(label='Missing Foods'):
             #     dpg.add_table_column(id='missing_food', label='Missing Days')
 
+########################################################################################################################
 
         with dpg.tab(label='Weight Tracker'):
+            '''
+            Weight Tracker
+            
+            TODO:
+             
+            '''
+
             dpg.add_text('Weight Tracker')
             dpg.add_button(label='Read Weight Tracker', callback=open_file, user_data='weight_tracker')
 
+            with dpg.collapsing_header(label='Missing Dates'):
+                with dpg.table(borders_outerH=True, scrollY=True, sortable=True, height=400,
+                               borders_innerV=True, borders_outerV=True, width=200, tag='wt_missing_days'):
+                    dpg.add_table_column()
+
+########################################################################################################################
+
         with dpg.tab(label='File System'):
+            '''
+            File merging I/O
+            
+            TODO:
+                How to flag exiting files?
+                Track and export files as pickle/.csv
+            '''
+
             dpg.add_text('File System')
 
+            with dpg.table(label='Daily Logs', tag='io_dl_col', width=150, height=300, scrollY=True, header_row=True,
+                               pos=[50, 50]):
+                dpg.add_table_column()
+
+            with dpg.table(label='Weight Tracker', tag='io_wt_col', width=150, height=300, header_row=True, scrollY=True,
+                               pos=[250, 50]):
+                dpg.add_table_column()
+
+            with dpg.table(label='Food Tracker', tag='io_ft_col', width=150, height=300, header_row=True, scrollY=True,
+                               pos=[400, 50]):
+                dpg.add_table_column()
+
+########################################################################################################################
+
         with dpg.tab(label='Data Processing'):
+            '''
+            TODO:
+                Graphs graphs graphs
+            '''
             dpg.add_text('Data Processing')
+
+########################################################################################################################
 
 dpg.create_viewport(title='Life Data Program', width=1200, height=800)
 dpg.setup_dearpygui()

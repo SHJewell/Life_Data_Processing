@@ -52,6 +52,7 @@ class dailyLog:
         self.linear = pd.Series
         self.reported_dates = pd.Series
         self.missing_dates = set()
+        self.year = None
 
         if path:
             self.year = utils.get_year(self.path)
@@ -154,6 +155,10 @@ class dailyLog:
             pickle.dump(data, a)
 
 
-    def return_data(self):
+    def ret_data(self):
 
         return self.data
+
+    def ret_date(self):
+
+        return self.year

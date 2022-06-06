@@ -41,6 +41,8 @@ def word_processor(word):
 def get_year(path):
     import re
     '''
+    Should this be a datetime object?
+    
     pulls year out of file path
     :return: int of year
     '''
