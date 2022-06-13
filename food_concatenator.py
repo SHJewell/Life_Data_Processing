@@ -5,18 +5,7 @@ Created on Sat Aug  8 16:38:37 2020
 @author: Scott
 
 TODO:
-    Current:
-        Food master filled through 2020
-    General
-        Missing dates needs to be calculated
-        Doesn't deal with duplicates in the food master file
-        Writes skipped days as zeros, should be nans
-    New Year:
-        Maybe have the ability to add individual months instead of whole years
-        Loop through months
-            Loops will almost certainly be necessary, I don't see a way to do this without them
-            Turn into ... dict? using date objects
-            Convert to cals, etc per day
+    Needs to be adapted so that it doesn't matter which file is read in first
 
 """
 
@@ -50,6 +39,8 @@ class foodTracker:
         self.year = None
         self.errors = []
         self.missing_food = []
+        self.files = set()
+        self.file_names = set()
 
 
     def import_month(self, filepath):
@@ -60,6 +51,7 @@ class foodTracker:
         '''
 
         month = pd.read_excel(self.file_path + filepath, sheet_name=None)
+        self.files.add(self.file_path + filepath)
 
         months_nutr = {}
 
@@ -174,6 +166,7 @@ class foodTracker:
                     self.year = file_year
 
                 month = self.import_month(file)
+                self.file_names.add(file)
 
                 try:
                     self.nutrition_calendar = pd.concat(
@@ -201,6 +194,13 @@ class foodTracker:
         self.food_master.fillna(0, inplace=True)
         self.food_master.drop_duplicates(subset='food', keep='first', inplace=True)
 
+    def is_food_master(self):
+
+        if not self.food_master.empty():
+
+            return True
+
+        return False
 
     def export_as_dat(self, path):
 
@@ -209,6 +209,18 @@ class foodTracker:
     def export_as_csv(self, path):
 
         self.nutrition_calendar.to_csv(path + '\\' + str(self.year) + '_nutr_cal.csv')
+
+    def ret_file_names(self):
+
+        return self.file_names
+
+    def ret_read_folder(self):
+
+        return self.file_path
+
+    def ret_missing_dates(self):
+
+        return self.missing_dates
 
 
 # if __name__ == '__main__':

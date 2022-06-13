@@ -53,6 +53,7 @@ class dailyLog:
         self.reported_dates = pd.Series
         self.missing_dates = set()
         self.year = None
+        self.title = None
 
         if path:
             self.year = utils.get_year(self.path)
@@ -71,6 +72,7 @@ class dailyLog:
 
 
         self.path = kwargs.get('path', self.path)
+        self.title = self.path.split('/')[-1]
 
         temp = pd.read_excel(self.path, sheet_name=None, index_col=1)
 
@@ -162,3 +164,7 @@ class dailyLog:
     def ret_date(self):
 
         return self.year
+
+    def ret_name(self):
+
+        return self.title

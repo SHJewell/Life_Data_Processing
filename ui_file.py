@@ -26,19 +26,19 @@ food_log = ft()
 '''
 Main window
 '''
-dpg.add_colormap_registry(label="Demo Colormap Registry", tag="__demo_colormap_registry")
-
-dpg.add_colormap([[255, 0, 0]], True, tag="red_tag", parent="__demo_colormap_registry")
-dpg.add_colormap([[0, 255, 0]], True, tag="green_tag",parent="__demo_colormap_registry")
-
-#not sure this is the way to go
-with dpg.theme() as enabled_theme:
-    with dpg.theme_component(dpg.mvAll):
-        dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 255, 0), category=dpg.mvThemeCat_Core)
-
-with dpg.theme() as disabled_theme:
-    with dpg.theme_component(dpg.mvAll):
-        dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 255, 0), category=dpg.mvThemeCat_Core)
+# dpg.add_colormap_registry(label="Demo Colormap Registry", tag="__demo_colormap_registry")
+#
+# dpg.add_colormap([[255, 0, 0]], True, tag="red_tag", parent="__demo_colormap_registry")
+# dpg.add_colormap([[0, 255, 0]], True, tag="green_tag",parent="__demo_colormap_registry")
+#
+# #not sure this is the way to go
+# with dpg.theme() as enabled_theme:
+#     with dpg.theme_component(dpg.mvAll):
+#         dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 255, 0), category=dpg.mvThemeCat_Core)
+#
+# with dpg.theme() as disabled_theme:
+#     with dpg.theme_component(dpg.mvAll):
+#         dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 255, 0), category=dpg.mvThemeCat_Core)
 
 with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
     with dpg.tab_bar():
@@ -49,8 +49,8 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             def add_file(user_data, data):
                 # what = list(data['selections'].values())
                 # print(what[0])
-                # dpg.set_value(user_data, what[0])
 
+                # dpg.set_value(user_data, what[0])
                 def dl_read(log_path):
 
                     kl = list(log_path['selections'].keys())
@@ -69,10 +69,14 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                     with dpg.table_row(parent='io_dl_col'):
                         dpg.add_text(f'{daily_log.ret_date()}')
 
-                    dpg.bind_colormap('dl_file_color', 'green_flag')
+                    # pg.bind_colormap('dl_file_color', 'green_flag')
 
                 def food_read(log_path):
-                    print('Empty function!')
+                    #print('Empty function!')
+                    kl = list(log_path['selections'].keys())
+
+                    food_log.
+
                     return
 
                 def nutr_file(log_path):
@@ -111,9 +115,9 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             #dpg.add_text('Daily Log')
             with dpg.group(horizontal=True):
                 dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
-                dpg.add_colormap_button(label="None", tag='dl_file_colors')
-                #dpg.bind_colormap(dpg.last_item(), "red_tag")
-                dpg.bind_item_theme('dl_file_colors', disabled_theme)
+                # dpg.add_colormap_button(label="None", tag='dl_file_colors')
+                # dpg.bind_colormap(dpg.last_item(), "red_tag")
+                # dpg.bind_item_theme('dl_file_colors', disabled_theme)
 
             #dpg.add_date_picker(tag='dl_calendar')
             with dpg.collapsing_header(label='Activity Totals'):
@@ -137,6 +141,8 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
             dpg.add_text('Food Log')
             dpg.add_button(label='Read Food Log', callback=open_file, user_data='food_log')
             dpg.add_button(label='Read Nutritional Info', callback=open_file, user_data='nutr_file')
+
+            dpg.add_combo()
 
             with dpg.collapsing_header(label='Missing Dates'):
                 with dpg.table(borders_outerH=True, scrollY=True, sortable=True, height=400,
@@ -177,17 +183,15 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
 
             dpg.add_text('File System')
 
-            with dpg.table(label='Daily Logs', tag='io_dl_col', width=150, height=300, scrollY=True, header_row=True,
-                               pos=[50, 50]):
-                dpg.add_table_column()
+            with dpg.group(horizontal=True):
+                with dpg.table(label='Daily Logs', tag='io_dl_col', width=150, height=300, scrollY=True, header_row=True):
+                    dpg.add_table_column()
 
-            with dpg.table(label='Weight Tracker', tag='io_wt_col', width=150, height=300, header_row=True, scrollY=True,
-                               pos=[250, 50]):
-                dpg.add_table_column()
+                with dpg.table(label='Weight Tracker', tag='io_wt_col', width=150, height=300, header_row=True, scrollY=True):
+                    dpg.add_table_column()
 
-            with dpg.table(label='Food Tracker', tag='io_ft_col', width=150, height=300, header_row=True, scrollY=True,
-                               pos=[400, 50]):
-                dpg.add_table_column()
+                with dpg.table(label='Food Tracker', tag='io_ft_col', width=150, height=300, header_row=True, scrollY=True):
+                    dpg.add_table_column()
 
 ########################################################################################################################
 

@@ -21,6 +21,7 @@ class weightLog():
         self.year = None
         self.errors = []
         self.path = None
+        self.title = None
 
     def read_log(self, path):
         '''
@@ -32,6 +33,7 @@ class weightLog():
         '''
 
         self.path = path
+        self.title = path.split('/')[-1]
         temp = pd.read_excel(path, sheet_name=None)
         emerge = []
         amerge = []
@@ -90,19 +92,23 @@ class weightLog():
 
         return self.year
 
+    def ret_name(self):
+
+        return self.title
+
 
 #loc = "E:/Documents/Coding/Life Data Processing/2020 sheets"
 
-if __name__ == '__main__':
-
-    path = 'E:\Documents\Datasets\Life Data\\2020 sheets\Weight Tracker 2020.xlsx'
-    #temp = pd.read_excel(path, sheet_name=None, engine='openpyxl')
-
-    weight20 = weightLog()
-
-    sheet = weight20.read_log(path)
-
-    breakpoint()
+# if __name__ == '__main__':
+#
+#     path = 'E:\Documents\Datasets\Life Data\\2020 sheets\Weight Tracker 2020.xlsx'
+#     #temp = pd.read_excel(path, sheet_name=None, engine='openpyxl')
+#
+#     weight20 = weightLog()
+#
+#     sheet = weight20.read_log(path)
+#
+#     breakpoint()
 
 #==============================================================================
 #open xlsx, generic
