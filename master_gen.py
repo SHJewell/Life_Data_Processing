@@ -4,7 +4,9 @@ Created on Tue Nov 24 17:15:20 2020
 
 @author: Scott
 
-TO DO
+TODO:
+    Generates an extra hour on daily log
+    Generates an extra day on food tracker
 
 
 """
@@ -21,14 +23,15 @@ import pprint
 def date_processor(obj):
 #returns a datetime.date object
     
-    dt_obj_dummy = datetime.date(2000,1,1)
-    
+    dt_obj_dummy = datetime.date(2000, 1, 1)
+
+    # this should be replaced by isinstance method
     if type(obj) == type(dt_obj_dummy):
         return obj
     
     else:
         
-        out = datetime.date(int(obj[0:4]),int(obj[4:6]),int(obj[6:8]))
+        out = datetime.date(int(obj[0:4]), int(obj[4:6]), int(obj[6:8]))
         return out
     
 #------------------------------------------------------------------------------
@@ -49,7 +52,7 @@ def daily_totals(calendar):
     
     for day in calendar:
         
-        days_acts = dict(zip(cats,len(cats)*[0]))
+        days_acts = dict(zip(cats, len(cats)*[0]))
         
         for cat in calendar[day]:
             
@@ -137,7 +140,7 @@ dates = master.index.values
 file = "raw_master_db.csv"
 master.to_csv(file)
 
-pickle.dump(master,open("raw_master_db.dat",'wb'))
+pickle.dump(master, open("raw_master_db.dat",'wb'))
 
 
         

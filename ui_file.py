@@ -1,5 +1,6 @@
 '''
 TODO:
+    Selectable tables should actually be list boxes!
     Format tabs
     Figure out I/O layout
     Graphs!
@@ -21,10 +22,26 @@ weight_log = wl()
 food_log = ft()
 
 
+########################################################################################################################
+'''
+Main window
+'''
+dpg.add_colormap_registry(label="Demo Colormap Registry", tag="__demo_colormap_registry")
+
+dpg.add_colormap([[255, 0, 0]], True, tag="red_tag", parent="__demo_colormap_registry")
+dpg.add_colormap([[0, 255, 0]], True, tag="green_tag",parent="__demo_colormap_registry")
+
+#not sure this is the way to go
+with dpg.theme() as enabled_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 255, 0), category=dpg.mvThemeCat_Core)
+
+with dpg.theme() as disabled_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 255, 0), category=dpg.mvThemeCat_Core)
+
 with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
     with dpg.tab_bar():
-
-########################################################################################################################
 
         def open_file(sender, app_data, user_data):
             fd_uid = dpg.generate_uuid()
@@ -51,6 +68,8 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                     dpg.add_table_row(parent='io_dl_col')
                     with dpg.table_row(parent='io_dl_col'):
                         dpg.add_text(f'{daily_log.ret_date()}')
+
+                    dpg.bind_colormap('dl_file_color', 'green_flag')
 
                 def food_read(log_path):
                     print('Empty function!')
@@ -89,18 +108,21 @@ with dpg.window(label='Life Data Tracker and Analysis', tag='primary'):
                 Import Daily log
             '''
 
-            dpg.add_text('Daily Log')
-            dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
+            #dpg.add_text('Daily Log')
+            with dpg.group(horizontal=True):
+                dpg.add_button(label='Read Daily Log', callback=open_file, user_data='daily_log')
+                dpg.add_colormap_button(label="None", tag='dl_file_colors')
+                #dpg.bind_colormap(dpg.last_item(), "red_tag")
+                dpg.bind_item_theme('dl_file_colors', disabled_theme)
 
-
+            #dpg.add_date_picker(tag='dl_calendar')
+            with dpg.collapsing_header(label='Activity Totals'):
+                dpg.add_table(label='Activity Totals', tag='dl_totals')
 
             with dpg.collapsing_header(label='Missing Dates'):
                 with dpg.table(borders_outerH=True, scrollY=True, reorderable=True, height=400,
                                borders_innerV=True, borders_outerV=True, width=200, tag='dl_missing_days'):
-                    dpg.add_table_column()
-
-            #dpg.add_date_picker(tag='dl_calendar')
-            dpg.add_table(label='Activity Totals', tag='dl_totals')
+                    dpg.add_table_column() # make this a combo box? Or a date picker?
 
 ########################################################################################################################
 
