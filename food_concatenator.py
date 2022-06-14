@@ -141,7 +141,7 @@ class foodTracker:
                 w.write(str(date) + ': ' + food + '\n')
 
 
-    def gen_new_log(self):
+    def import_year(self):
         '''
         Loops though months in year, and feeds existing food tracking sheets to import_month()
         :return:
@@ -165,14 +165,43 @@ class foodTracker:
                     self.errors.append("Years do not match!")
                     self.year = file_year
 
-                month = self.import_month(file)
                 self.file_names.add(file)
+                self.files.add(file)
 
-                try:
-                    self.nutrition_calendar = pd.concat(
-                        [self.nutrition_calendar, pd.DataFrame(month).transpose()])
-                except TypeError:
-                    self.nutrition_calendar = pd.DataFrame(month).transpose()
+        if self.food_master.empty:
+
+            self.errors.append('Food master missing!')
+
+    def concat_food_months(self):
+        '''
+        Takes our list of month files and concatenates it with the nutrtion file
+
+        If either months or food master are missing throw error.
+        :return:
+        '''
+
+        if len(self.files) == 0:
+
+            self.errors.append('Attempted to concatenate without month files')
+
+            return 'Error: Import months!'
+
+        if self.food_master.empty:
+
+            self.errors.append('Attempted to concatenate without food master')
+
+            return 'Error: Import food master!'
+
+        for month_file in self.files:
+
+            month = self.import_month(month_file)
+            self.file_names.add(month_file)
+
+            try:
+                self.nutrition_calendar = pd.concat(
+                    [self.nutrition_calendar, pd.DataFrame(month).transpose()])
+            except TypeError:
+                self.nutrition_calendar = pd.DataFrame(month).transpose()
 
 
     def import_food_master(self, path):
@@ -201,6 +230,14 @@ class foodTracker:
             return True
 
         return False
+
+    def is_months(self):
+
+        if len(self.months) != 0:
+
+            return True
+
+        return false
 
     def export_as_dat(self, path):
 
