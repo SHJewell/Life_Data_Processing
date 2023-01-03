@@ -14,8 +14,7 @@ TODO
 
 import pandas as pd
 import openpyxl as pxl
-
-year = 2022
+import os
     
 activities = ["Friends",
              "Family",
@@ -44,6 +43,8 @@ activities = ["Friends",
              "Outdoors",
              "Transit"]
 
+
+
 #def format_activies(xlsfile,acts):
 
     #for item in acts:
@@ -65,7 +66,8 @@ def write_wt(year):
                   'Length',
                   'Intensity',
                   'Type']
-    
+
+
     date0 = str(year) + '-01'
     dateN = str(year+1) + '-01'
     idx = pd.date_range(start=date0, end=dateN, freq='M')
@@ -80,33 +82,36 @@ def write_wt(year):
         
         days = pd.date_range(start=strt, end=stp, freq='D')
         days = days.date
-        temp = pd.DataFrame(index=days,columns=col_titles)
+        temp = pd.DataFrame(index=days, columns=col_titles)
         weight_sheets[month.month_name()] = temp
         
-    name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + str(year) + " weight tracker.xlsx"
-            
+    # name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + str(year) + " weight tracker.xlsx"
+    name = os.path.join(os.getcwd(), f'{path_parent}/{str(year)} sheets/{str(year)} weight tracker.xlsx')
+
     writer = pd.ExcelWriter(name, date_format='mm/dd')
     
     for mo_sheet in weight_sheets:
 
-        weight_sheets[mo_sheet].to_excel(writer,sheet_name=mo_sheet,index_label="date",freeze_panes=(1,1))
+        weight_sheets[mo_sheet].to_excel(writer, sheet_name=mo_sheet, index_label="date", freeze_panes=(1, 1))
         
-    writer.save()
+    writer.close()
 
 #food tracker
 def write_ft(year):
     
     col_titles = ['what', 'amount']
-    
+
     date0 = str(year) + '-01'
     dateN = str(year+1) + '-01'
     idx = pd.date_range(start=date0, end=dateN, freq='M')
     
     monthly_sheets = {}
+
+
     
     for month in idx:
         
-        num_days = pd.Period(month,freq='M').days_in_month
+        num_days = pd.Period(month, freq='M').days_in_month
         strt = str(year) + "-" + str(month.month) + '-01'
         stp = str(year) + "-" + str(month.month) + "-" + str(num_days)
         
@@ -115,7 +120,7 @@ def write_ft(year):
         weekN = 1
         months_sheet = {}
 
-        for day in pd.date_range(start=strt,end=stp,freq='D'):
+        for day in pd.date_range(start=strt, end=stp, freq='D'):
             
             if (day.dayofweek == 0) and (len(row1) != 0):
                 
@@ -132,7 +137,7 @@ def write_ft(year):
             row1.append(day.date())    #we need this twice
             row2.append(col_titles[0])
             row2.append(col_titles[1])
-        
+
         #write last week, even if it is unfinished
         row1.append(day.date())
         row1.append(day.date())
@@ -141,25 +146,29 @@ def write_ft(year):
         
         temp = pd.DataFrame(columns=row1)
         temp.loc[0] = row2
-                
+
         months_sheet["Week " + str(weekN)] = temp
         
         monthly_sheets[month.month_name()] = months_sheet
         
     for mo_sheet in monthly_sheets:
-        
-        name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + str(year) + " " + mo_sheet + " food tracker.xlsx"
+
+
+        #name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + str(year) + " " + mo_sheet + " food tracker.xlsx"
+        name = os.path.join(os.getcwd(), f'{path_parent}/{str(year)} sheets/{str(year)} {mo_sheet} food tracker.xlsx')
         writer = pd.ExcelWriter(name, date_format='mm/dd')
-        
+
         for week_sheet in monthly_sheets[mo_sheet]:
     
-            monthly_sheets[mo_sheet][week_sheet].to_excel(writer,sheet_name=week_sheet,index=False)
+            monthly_sheets[mo_sheet][week_sheet].to_excel(writer, sheet_name=week_sheet, index=False)
         
-        writer.save()
+        writer.close()
 
-    #this seems silly to save the workbook in pandas then reopen it in openpyxl,
-    #but it's simpler, especially for portion of the code that will probably
-    #only be used once a year
+        '''
+        this seems silly to save the workbook in pandas then reopen it in openpyxl,
+        but at the time of writing it's simpler for formatting purposes, 
+        especially for portion of the code that will probably only be used once a year
+        '''
     
         wb = pxl.load_workbook(name)
                     
@@ -172,7 +181,7 @@ def write_ft(year):
                 
                 while n < cur_sheet.max_column:
                         
-                    cur_sheet.merge_cells(start_row=1,start_column=n,end_row=1,end_column=n+1)
+                    cur_sheet.merge_cells(start_row=1, start_column=n, end_row=1, end_column=n+1)
                     n += 2
                                 
         wb.save(name)
@@ -182,7 +191,7 @@ def write_dl(year,activities):
     
     time = ['100']
     
-    for n in range(1,48):
+    for n in range(1, 48):
         
         tminusone = str(time[n-1])
         
@@ -206,30 +215,32 @@ def write_dl(year,activities):
         strt = str(year) + "-" + str(month.month) + '-01'
         stp = str(year) + "-" + str(month.month) + "-" + str(num_days)
         
-        days = pd.date_range(start=strt,end=stp,freq='D')
+        days = pd.date_range(start=strt, end=stp, freq='D')
         days = days.date
         temp = pd.DataFrame(index=days,columns=time)
         daily_log[month.month_name()] = temp
         
-    name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + "daily log " + str(year) + ".xlsx"
+    # name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + "daily log " + str(year) + ".xlsx"
+    name = os.path.join(os.getcwd(), f'{path_parent}/{str(year)} sheets/Daily log {str(year)}.xlsx')
 
     writer = pd.ExcelWriter(name, date_format='mm/dd', mode='w')
     
     for mnth in daily_log:
 
-        daily_log[mnth].to_excel(writer,sheet_name=mnth, index_label="date", freeze_panes=(1,1))
-        
+        daily_log[mnth].to_excel(writer, sheet_name=mnth, index_label="date", freeze_panes=(1, 1))
+
     writer.save()
     
     def add_column(sheet, column):
         
-        sheet.insert_cols(1,1)
+        sheet.insert_cols(1, 1)
         
         for rowy, value in enumerate(column, start=1):
             sheet.cell(row=rowy+1, column=1, value=value)
      
     #will need to     
-    template = "E:\Documents\Datasets\Life Data\Spreadsheets\daily template.xlsx"
+    #template = "E:\Documents\Datasets\Life Data\Spreadsheets\daily template.xlsx"
+    template = f'daily template.xlsx'
     
     x = pxl.load_workbook(template)
     y = pxl.load_workbook(name)
@@ -260,7 +271,13 @@ def write_dl(year,activities):
 
 if __name__ == '__main__':
 
+    year = 2023
+
+    path_parent = './'
+
+    if not os.path.isdir(os.path.join(os.getcwd(), path_parent, f'{year} sheets')):
+        os.mkdir(os.path.join(os.getcwd(), path_parent, f'{year} sheets'))
 
     write_wt(year)
     write_ft(year)
-    #write_dl(year, activities)
+    write_dl(year, activities)
