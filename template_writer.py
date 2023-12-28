@@ -17,7 +17,8 @@ import openpyxl as pxl
 import os
     
 activities = ["Friends",
-             "Family",
+             "Near Family",
+             "Extended Family",
              "Steph",
              "Pets",
              "Sleep",
@@ -106,8 +107,6 @@ def write_ft(year):
     idx = pd.date_range(start=date0, end=dateN, freq='M')
     
     monthly_sheets = {}
-
-
     
     for month in idx:
         
@@ -137,12 +136,6 @@ def write_ft(year):
             row1.append(day.date())    #we need this twice
             row2.append(col_titles[0])
             row2.append(col_titles[1])
-
-        #write last week, even if it is unfinished
-        row1.append(day.date())
-        row1.append(day.date())
-        row2.append(col_titles[0])
-        row2.append(col_titles[1])
         
         temp = pd.DataFrame(columns=row1)
         temp.loc[0] = row2
@@ -223,13 +216,13 @@ def write_dl(year,activities):
     # name = 'E:/Documents/Datasets/Life Data/' + str(year) + " sheets//" + "daily log " + str(year) + ".xlsx"
     name = os.path.join(os.getcwd(), f'{path_parent}/{str(year)} sheets/Daily log {str(year)}.xlsx')
 
-    writer = pd.ExcelWriter(name, date_format='mm/dd', mode='w')
+    with pd.ExcelWriter(name, date_format='mm/dd', mode='w') as writer:
     
-    for mnth in daily_log:
+        for mnth in daily_log:
 
-        daily_log[mnth].to_excel(writer, sheet_name=mnth, index_label="date", freeze_panes=(1, 1))
+            daily_log[mnth].to_excel(writer, sheet_name=mnth, index_label="date", freeze_panes=(1, 1))
 
-    writer.save()
+        #writer.to_excel()
     
     def add_column(sheet, column):
         
@@ -271,7 +264,7 @@ def write_dl(year,activities):
 
 if __name__ == '__main__':
 
-    year = 2023
+    year = 2024
 
     path_parent = './'
 
